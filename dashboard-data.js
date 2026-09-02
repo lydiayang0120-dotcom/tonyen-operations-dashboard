@@ -57,12 +57,12 @@
   const sorted = grouped => [...grouped.values()].sort((a, b) => a.m - b.m);
   function parseNewRows(values) {
     const grouped = new Map();
-    for (const row of records(values, ['月份','品牌代碼','年度歸屬','年度月序','分店','資料狀態','實際新客','新客目標'])) {
+    for (const row of records(values, ['月份','品牌代碼','年度歸屬','年度月序','分店','資料狀態','到店數','新客目標'])) {
       if (!selected(row) || row['資料狀態'] !== '已匯入') continue;
       const key = storeCode(row['分店']);
       if (!key) throw new Error('新客工作表出現未設定的分店。');
-      const a = required(row['實際新客']), t = number(row['新客目標']);
-      if (!Number.isInteger(a) || (t !== null && !Number.isInteger(t))) throw new Error('新客數與目標必須是整數。');
+      const a = required(row['到店數']), t = number(row['新客目標']);
+      if (!Number.isInteger(a) || (t !== null && !Number.isInteger(t))) throw new Error('新客到店數與目標必須是整數。');
       add(grouped, monthIndex(row, '年度月序'), key, {a, t});
     }
     const result = sorted(grouped);
@@ -207,7 +207,7 @@
     const consumptionRows = parseConsumptionRows(ranges[3]?.values, ranges[4]?.values);
     if(newRows.length!==consumptionRows.length) throw new Error('新客與消費月份不一致。');
     for(const row of newRows) for(const code of storeCodes) {
-      if(row[code].a!==consumptionRows.find(r=>r.m===row.m)?.new[code].count) throw new Error('新客實績與分店消費數不一致。');
+      if(row[code].a!==consumptionRows.find(r=>r.m===row.m)?.new[code].arrivals) throw new Error('新客到店實績與分店消費到店數不一致。');
     }
     return {newRows, metaRows, budgetRows, consumptionRows};
   }

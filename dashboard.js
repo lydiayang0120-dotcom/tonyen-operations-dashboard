@@ -144,7 +144,7 @@
     const grid=[0,.25,.5,.75,1].map(k=>'<line class="sms-axis" x1="'+left+'" y1="'+y(max*k)+'" x2="'+(w-right)+'" y2="'+y(max*k)+'"></line><text class="sms-axis-text" x="'+(left-8)+'" y="'+(y(max*k)+4)+'" text-anchor="end">'+fmt(max*k)+'</text>').join('');
     const xt=labels.map((label,i)=>'<text class="sms-axis-text" x="'+x(i)+'" y="'+(h-14)+'" text-anchor="middle">'+label.replace('2025/','25/').replace('2026/','')+'</text>').join('');
     const dots=(values,kind)=>values.map((v,i)=>v===null?'':'<circle class="sms-dot-'+kind+'" cx="'+x(i)+'" cy="'+y(v)+'" r="5"><title>'+labels[i]+' '+(kind==='actual'?'實績':'目標')+' '+fmt(v)+'</title></circle>').join('');
-    return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="新客實績與目標趨勢"><title>新客實績與目標趨勢</title>'+grid+'<path class="sms-line-target" d="'+path(targets)+'"></path><path class="sms-line-actual" d="'+path(actual)+'"></path>'+dots(targets,'target')+dots(actual,'actual')+xt+'</svg>';
+    return '<svg viewBox="0 0 '+w+' '+h+'" role="img" aria-label="新客到店實績與目標趨勢"><title>新客到店實績與目標趨勢</title>'+grid+'<path class="sms-line-target" d="'+path(targets)+'"></path><path class="sms-line-actual" d="'+path(actual)+'"></path>'+dots(targets,'target')+dots(actual,'actual')+xt+'</svg>';
   }
   function updateNew() {
     const mode=$('#sms-new-mode').value,store=$('#sms-new-store').value,cutoff=Number($('#sms-new-month').value);

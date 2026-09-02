@@ -9,7 +9,7 @@ function fixtures() {
   const names=['彤顏醫美','彤顏健保','八德玥顏','琢顏診所','林口彤顏','永和彤顏','青埔臻顏'];
   for(let m=0;m<12;m++) {
     for(const name of names) {
-      newRows.push({'月份':data.months[m],'品牌代碼':'TY','年度歸屬':2026,'年度月序':m+1,'分店':name,'資料狀態':m<2?'已匯入':'待匯入','實際新客':name==='彤顏醫美'?1:name==='彤顏健保'?2:0,'新客目標':10});
+      newRows.push({'月份':data.months[m],'品牌代碼':'TY','年度歸屬':2026,'年度月序':m+1,'分店':name,'資料狀態':m<2?'已匯入':'待匯入','實際新客':name==='彤顏醫美'?1:name==='彤顏健保'?2:0,'到店數':name==='彤顏醫美'?2:name==='彤顏健保'?4:0,'新客目標':10});
       if(m<2) metaRows.push({'月份':data.months[m],'品牌代碼':'TY','年度歸屬':2026,'月序':m+1,'分店':name,'實際花費':100,'訊息花費':80,'Meta詢問數':4,'Meta預算':120,'資料完整性':'已確認','查詢備註':''});
     }
     if(m<2) metaRows.push({'月份':data.months[m],'品牌代碼':'TY','年度歸屬':2026,'月序':m+1,'分店':'品牌整體','實際花費':0,'訊息花費':0,'Meta詢問數':0,'Meta預算':0,'資料完整性':'已確認','查詢備註':'無法歸屬單店的品牌活動'});
@@ -29,6 +29,7 @@ const ranges=(raw,names=rangeNames)=>raw.map((rows,index)=>({range:names[index],
 test('fiscal year, confirmed months and message-cost CPA',()=>{
   const r=data.parseAll(ranges(fixtures()));
   assert.equal(r.newRows.length,2);
+  assert.equal(r.newRows[0].tm.a,2);
   assert.equal(data.months[0],'2025/12');
   assert.equal(data.months[11],'2026/11');
   assert.equal(data.metaTotal(r.metaRows,'all').cpa,20);
@@ -49,7 +50,7 @@ test('duplicate keys, missing new-customer months and invalid numbers fail close
   assert.throws(()=>data.parseNewRows(table([...raw[0],raw[0][0]])),/重複/);
   assert.throws(()=>data.parseNewRows(table(raw[0].filter(r=>r['年度月序']!==1))),/完整/);
   assert.throws(()=>data.number('#DIV/0!'),/無效/);
-  assert.throws(()=>data.parseNewRows(table(raw[0].map((r,i)=>i===0?{...r,'實際新客':null}:r))),/缺少/);
+  assert.throws(()=>data.parseNewRows(table(raw[0].map((r,i)=>i===0?{...r,'到店數':null}:r))),/缺少/);
 });
 test('mismatched dates, schema and source totals fail closed',()=>{
   const raw=fixtures();
@@ -117,7 +118,7 @@ test('UI login, refresh, four panels, consumption filters and logout',async()=>{
   intervals[0]();oauth.callback({access_token:'synthetic-token',expires_in:3600});
   await new Promise(resolve=>setImmediate(resolve));
   assert.equal(root.hidden,false);assert.equal(reads,2);
-  assert.match(elements.get('#sms-new-actual').html,/6</);
+  assert.match(elements.get('#sms-new-actual').html,/12</);
   assert.match(elements.get('#sms-meta-cpa').html,/20</);
   assert.match(elements.get('#sms-meta-completeness').textContent,/每月執行目標/);
   assert.match(elements.get('#sms-budget-total').html,/7200</);
@@ -131,7 +132,7 @@ test('UI login, refresh, four panels, consumption filters and logout',async()=>{
   assert.doesNotMatch(elements.get('#sms-consumption-table').html,/2025\/12/);
   elements.get('#sms-new-mode').value='monthly';elements.get('#sms-new-store').value='tm';
   elements.get('#sms-new-mode').events.change();
-  assert.match(elements.get('#sms-new-actual').html,/1</);
+  assert.match(elements.get('#sms-new-actual').html,/2</);
   let releaseFetch;
   fetchGate=new Promise(resolve=>{releaseFetch=resolve;});nextBudget=150;
   const refreshing=elements.get('#sms-refresh').events.click();
@@ -215,7 +216,7 @@ test('seven-store totals and missing targets never become zero targets',()=>{
   assert.equal(data.budgetAggregate(parsed.budgetRows[0],'all').a,null);
 });
 
-test('new-customer and consumption mismatches fail closed',()=>{
-  const raw=fixtures();raw[0][0]['實際新客']=9;
-  assert.throws(()=>data.parseAll(ranges(raw)),/新客實績與分店消費/);
+test('new-customer arrivals and consumption arrivals mismatches fail closed',()=>{
+  const raw=fixtures();raw[0][0]['到店數']=9;
+  assert.throws(()=>data.parseAll(ranges(raw)),/新客到店實績與分店消費到店數/);
 });

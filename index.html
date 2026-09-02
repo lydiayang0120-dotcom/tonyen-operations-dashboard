@@ -23,7 +23,7 @@
     @media(max-width:460px){ body{padding:0}.sms-auth-wall{min-height:100vh;border-radius:0}.sms-auth-card{padding:24px} }
   </style>
   <script src="config.js"></script>
-  <script src="dashboard-data.js?v=20260902-ty-v103"></script>
+  <script src="dashboard-data.js?v=20260902-ty-v104"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
@@ -223,7 +223,7 @@
     <div>
       <p class="sms-kicker">Ton Yen</p>
       <h1>年度營運儀表板</h1>
-      <p class="sms-subtitle">彤顏診所｜2026 年度新客、消費、Meta 與預算分析</p>
+      <p class="sms-subtitle">彤顏診所｜2026 年度新客到店、消費、Meta 與預算分析</p>
     </div>
     <div><p class="sms-updated" id="sms-data-updated" role="status">等待授權讀取資料</p><div class="sms-controls" style="margin:8px 0 0"><button class="sms-tab" id="sms-refresh" type="button">更新資料</button><button class="sms-tab" id="sms-signout" type="button">登出儀表板</button></div></div>
   </header>
@@ -242,14 +242,14 @@
       <label><span>截至月份</span><select id="sms-new-month"></select></label>
     </div>
     <div class="sms-stats">
-      <div class="sms-card"><div class="sms-label">新客實績</div><div class="sms-value" id="sms-new-actual"></div><div class="sms-note" id="sms-new-period"></div></div>
+      <div class="sms-card"><div class="sms-label">新客到店實績</div><div class="sms-value" id="sms-new-actual"></div><div class="sms-note" id="sms-new-period"></div></div>
       <div class="sms-card"><div class="sms-label">新客目標</div><div class="sms-value" id="sms-new-target"></div><div class="sms-note" id="sms-new-target-note"></div></div>
       <div class="sms-card"><div class="sms-label">落後／超前</div><div class="sms-value" id="sms-new-gap"></div><div class="sms-note" id="sms-new-gap-note"></div></div>
       <div class="sms-card"><div class="sms-label">新客達成率</div><div class="sms-value" id="sms-new-rate"></div><div class="sms-note">依所選月份與分店計算</div></div>
     </div>
     <div class="sms-grid">
       <div class="sms-panel">
-        <div class="sms-panel-head"><h2>新客趨勢</h2><span class="sms-legend">米棕色：實績｜淡線：目標</span></div>
+        <div class="sms-panel-head"><h2>新客到店趨勢</h2><span class="sms-legend">米棕色：到店實績｜淡線：目標</span></div>
         <div class="sms-chart" id="sms-new-chart"></div>
       </div>
       <div class="sms-panel">
@@ -258,9 +258,9 @@
       </div>
     </div>
     <div class="sms-panel">
-      <div class="sms-panel-head"><h2>月份新客明細</h2><span class="sms-legend" id="sms-new-table-label"></span></div>
+      <div class="sms-panel-head"><h2>月份新客到店明細</h2><span class="sms-legend" id="sms-new-table-label"></span></div>
       <div class="sms-table-wrap"><table><thead><tr><th>月份</th><th>彤醫實績／目標</th><th>彤健實績／目標</th><th>八德實績／目標</th><th>桃園實績／目標</th><th>林口實績／目標</th><th>永和實績／目標</th><th>青埔實績／目標</th><th>整體實績／目標</th><th id="sms-new-rate-heading">整體達成率</th></tr></thead><tbody id="sms-new-table"></tbody><tfoot id="sms-new-total"></tfoot></table></div>
-      <p class="sms-footnote">新客以月報新客消費數計算。永和目標計至2026/09，青埔目標自2026/04起算；確認無目標月份為0，單店該月不顯示達成率。更名前後資料以同一分店累積。</p>
+      <p class="sms-footnote">新客以月報「新客到店數」計算，不使用消費數或客服詢問數。永和目標計至2026/09，青埔目標自2026/04起算；確認無目標月份為0，單店該月不顯示達成率。更名前後資料以同一分店累積。</p>
     </div>
   </section>
 
@@ -351,7 +351,7 @@
     </div>
   </section>
 
-  <script src="dashboard.js?v=20260902-ty-v103"></script>
+  <script src="dashboard.js?v=20260902-ty-v104"></script>
 </div>
 
 </body>
