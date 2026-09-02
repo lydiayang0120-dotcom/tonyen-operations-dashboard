@@ -61,7 +61,7 @@
     try {
       next=parseAll(ordered);
     } catch(error) {
-      if(!/年度預算須具備十二個月份與兩個平台/.test(error.message)) throw error;
+      if(!/年度預算須具備十二個月份與四個平台/.test(error.message)) throw error;
       // A transient partial batch response must not send an authorized user back to the login wall.
       [ordered[2]]=await fetchRanges(accessToken,[rangeSpecs[2]]);
       next=parseAll(ordered);
@@ -74,7 +74,7 @@
     fillMonthSelect($('#sms-new-month'),newRows.map(row=>row.m));
     fillMonthSelect($('#sms-meta-month'),metaRows.map(row=>row.m));
     fillMonthSelect($('#sms-consumption-month'),consumptionRows.map(row=>row.m));
-    const knownBudgetMonths=budgetRows.filter(row=>row.meta.a!==null||row.lap.a!==null).map(row=>row.m);
+    const knownBudgetMonths=budgetRows.filter(row=>budgetAggregate(row,'all').a!==null).map(row=>row.m);
     fillMonthSelect($('#sms-budget-month'),knownBudgetMonths.length?knownBudgetMonths:newRows.map(row=>row.m));
     if(metaRows.every(row=>metaTotal([row],'all').s===null)) $('#sms-meta-month').value=String(newRows.at(-1).m);
     $('#sms-data-updated').textContent='更新完成 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+'｜每 5 分鐘更新';

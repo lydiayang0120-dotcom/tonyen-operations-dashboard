@@ -31,6 +31,7 @@
   ]);
   const storeCode = value => storeAliases.get(String(value || '').trim()) || null;
   const metaCodes = [...storeCodes,'brand'];
+  const budgetPlatformKeys = ['meta','g_keyword','g_display','lap'];
   const metaCode = value => storeCode(value) || (value === '品牌整體' ? 'brand' : null);
   const sumComplete = values => values.length && values.every(Number.isFinite) ? values.reduce((a,b)=>a+b,0) : null;
   function monthIndex(row, field) {
@@ -92,13 +93,16 @@
     for (const row of records(values, ['月份','品牌代碼','年度歸屬','年度月序','廣告平台','預算金額','實際花費','實際花費來源','填寫狀態'])) {
       if (!selected(row)) continue;
       const platform = String(row['廣告平台'] || '');
-      const key = platform === 'Meta' ? 'meta' : platform.startsWith('LAP') ? 'lap' : null;
+      const key = platform === 'Meta' ? 'meta' :
+        platform === 'G關鍵字' ? 'g_keyword' :
+        platform === 'G多媒體' ? 'g_display' :
+        platform.startsWith('LAP') ? 'lap' : null;
       if (!key) throw new Error('年度預算出現未設定的平台。');
       const a = /待補|待匯入/.test(row['填寫狀態'] || '') ? null : number(row['實際花費']);
       add(grouped, monthIndex(row, '年度月序'), key, {b:number(row['預算金額']), a, partial:a === null || /部分|待補/.test(row['實際花費來源'] || '')});
     }
     const result = sorted(grouped);
-    if (result.length !== 12 || result.some(row => !row.meta || !row.lap)) throw new Error('年度預算須具備十二個月份與兩個平台。');
+    if (result.length !== 12 || result.some(row => budgetPlatformKeys.some(key => !row[key]))) throw new Error('年度預算須具備十二個月份與四個平台。');
     return result;
   }
   const sumKnown = values => values.every(value => value === null) ? null : values.reduce((total, value) => total + (value ?? 0), 0);
@@ -123,7 +127,7 @@
     return result;
   }
   function budgetAggregate(row, type) {
-    const list = type === 'all' ? [row.meta,row.lap] : [row[type]];
+    const list = type === 'all' ? budgetPlatformKeys.map(key => row[key]) : [row[type]];
     return {b:sumComplete(list.map(item => item.b)), a:sumKnown(list.map(item => item.a)), partial:list.some(item => item.partial || item.a === null || item.b === null)};
   }
   function consumptionMonth(value) {
@@ -211,7 +215,7 @@
     }
     return {newRows, metaRows, budgetRows, consumptionRows};
   }
-  const api = {months,number,storeCodes,sumComplete,sumKnown,newTotal,parseNewRows,parseMetaRows,parseBudgetRows,parseAll,metaTotal,budgetAggregate,parseConsumptionRows,consumptionTotal};
+  const api = {months,number,storeCodes,budgetPlatformKeys,sumComplete,sumKnown,newTotal,parseNewRows,parseMetaRows,parseBudgetRows,parseAll,metaTotal,budgetAggregate,parseConsumptionRows,consumptionTotal};
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else host.SMSData = Object.freeze(api);
 })(typeof window !== 'undefined' ? window : globalThis);
