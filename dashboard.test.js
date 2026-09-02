@@ -19,8 +19,8 @@ function fixtures() {
   for(let m=0;m<2;m++) {
     overview.push({'月份':data.months[m],'品牌代碼':'TY','客群':'新客','到店數':6,'消費數':3,'消費金額':700});
     overview.push({'月份':data.months[m],'品牌代碼':'TY','客群':'舊客','到店數':m,'消費數':m,'消費金額':m*50});
-    for(const [name,arrivals,count,amount] of [['彤顏醫美',2,1,100],['彤顏健保',4,2,600]]) detail.push({'月份':data.months[m],'品牌代碼':'TY','客群':'新客','統計基準':'依預約日期','預約店':name,'來源代碼':1,'到店數':arrivals,'消費數':count,'消費金額':amount});
-    if(m) detail.push({'月份':data.months[m],'品牌代碼':'TY','客群':'舊客','統計基準':'依預約日期','預約店':'彤顏健保','來源代碼':1,'到店數':1,'消費數':1,'消費金額':50});
+    for(const [name,arrivals,count,amount] of [['彤顏醫美',2,1,100],['彤顏健保',4,2,600]]) detail.push({'月份':data.months[m],'品牌代碼':'TY','客群':'新客','統計基準':'依預約日期','預約店':name,'來源店名':name,'來源代碼':1,'到店數':arrivals,'消費數':count,'消費金額':amount});
+    if(m) detail.push({'月份':data.months[m],'品牌代碼':'TY','客群':'舊客','統計基準':'依預約日期','預約店':'彤顏健保','來源店名':'彤顏健保','來源代碼':1,'到店數':1,'消費數':1,'消費金額':50});
   }
   return [newRows,metaRows,budgetRows,overview,detail];
 }
@@ -190,6 +190,15 @@ test('consumption accepts Sheet serial dates, excludes other fiscal years, and b
   raw[4].push({...raw[4][0],'月份':'2025-11'});
   assert.equal(data.parseConsumptionRows(table(raw[3]),table(raw[4])).length,2);
   assert.throws(()=>data.parseConsumptionRows(table(raw[3]),Array(1000).fill([])),/上限/);
+});
+
+test('renamed source groups with the same source code aggregate into one stable store',()=>{
+  const raw=fixtures(),aliasRow={...raw[4][0],'預約店':'彤醫','來源店名':'彤醫'};
+  raw[4].push(aliasRow);
+  Object.assign(raw[3][0],{'到店數':8,'消費數':4,'消費金額':800});
+  const rows=data.parseConsumptionRows(table(raw[3]),table(raw[4]));
+  assert.deepEqual(rows[0].new.tm,{amount:200,count:2,arrivals:4});
+  assert.equal(data.consumptionTotal(rows,'all','new').amount,1500);
 });
 
 test('seven-store totals and missing targets never become zero targets',()=>{

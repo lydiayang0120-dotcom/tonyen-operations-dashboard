@@ -156,7 +156,7 @@
       if (!cohort) throw new Error('月報出現未設定的客群。');
       add(grouped, m, cohort, {total:consumptionValues(row),...Object.fromEntries(storeCodes.map(code=>[code,emptyConsumption()]))});
     }
-    for (const row of records(detail, ['月份','品牌代碼','客群','統計基準','預約店','來源代碼','到店數','消費數','消費金額'])) {
+    for (const row of records(detail, ['月份','品牌代碼','客群','統計基準','預約店','來源代碼','到店數','消費數','消費金額','來源店名'])) {
       if (!isBrand(row)) continue;
       const m = consumptionMonth(row['月份']);
       if (m < 0) continue;
@@ -164,7 +164,11 @@
       const code = storeCode(row['預約店']), group = grouped.get(m)?.[cohort];
       if (!group || !code || row['統計基準'] !== '依預約日期') throw new Error('分店消費的客群、分店、月份或統計基準不符。');
       if (row['來源代碼'] === null) throw new Error('分店消費缺少來源代碼。');
-      const key = `${m}/${cohort}/${code}/${row['來源代碼']}`;
+      const originalStore = String(row['來源店名'] || '').trim();
+      if (!originalStore) throw new Error('分店消費缺少來源店名。');
+      // A monthly report can contain both the old and new branch names during a rename.
+      // They share one stable dashboard store code but remain distinct source groups.
+      const key = `${m}/${cohort}/${code}/${originalStore}/${row['來源代碼']}`;
       if (seen.has(key)) throw new Error('分店消費出現重複來源，停止加總。');
       seen.add(key);
       const value = consumptionValues(row);
