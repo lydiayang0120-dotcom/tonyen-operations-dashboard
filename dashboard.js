@@ -208,7 +208,7 @@
     $('#sms-meta-rate').textContent=total.rate===null?'—':pct(total.rate);
     $('#sms-meta-period').textContent='2025/12－'+months[cutoff]+'｜'+storeName(store)+'｜'+total.status;
     const partial=rows.filter(r=>metaTotal([r],store).status!=='已確認').map(r=>months[r.m]);
-    const budgetCopy=store==='all'?'全品牌 Meta 預算採年度規劃的每月執行目標。':'未提供單店 Meta 預算拆分，因此單店預算與執行率不顯示。';
+    const budgetCopy=store==='all'?'全品牌 Meta 預算採「年度預算」頁籤的每月核定額。':'單店 Meta 預算採「Meta月度KPI」G 欄的 PM 分配額。';
     $('#sms-meta-completeness').textContent=(partial.length?'部分資料或待補月份：'+partial.join('、')+'。卡片與 CPA 僅依已取得數據計算。':'所選期間與分店資料已確認。')+budgetCopy;
     const max=Math.max(...rows.map(r=>metaTotal([r],store).s||0),1);
     $('#sms-meta-bars').innerHTML=rows.map(r=>{const v=metaTotal([r],store);return '<div class="sms-bar-row"><span>'+months[r.m].slice(5)+'</span><div class="sms-bar-track"><div class="sms-bar" style="width:'+((v.s||0)/max*100)+'%;min-width:0"></div></div><span class="sms-bar-value" title="'+v.status+'">'+fmt(v.s)+'</span></div>';}).join('');
