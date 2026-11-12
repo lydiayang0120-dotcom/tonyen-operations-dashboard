@@ -145,7 +145,7 @@
     authButton.addEventListener('click',()=>{
       if(!tokenClient) return;
       setAuthStatus('請在 Google 授權視窗完成登入；若未出現，可再次按登入。');
-      tokenClient.requestAccessToken({prompt:'select_account'});
+      tokenClient.requestAccessToken({prompt:'',login_hint:'lydiayang0120@gmail.com'});
     });
     $('#sms-refresh').addEventListener('click',refreshData);
     $('#sms-signout').addEventListener('click',()=>signOut());
