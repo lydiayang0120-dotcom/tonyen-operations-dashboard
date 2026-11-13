@@ -6,6 +6,20 @@
   const config=window.SMS_CONFIG||{};
   let newRows=[],metaRows=[],budgetRows=[],consumptionRows=[];
   let tokenClient=null,sessionToken=null,tokenExpires=0,expiryTimer=null,busy=false,requestVersion=0;
+  const expenseOrigin='https://n-akdizr76v3mhqsatbg7c4gsw7aijgczxqkvrlki-0lu-script.googleusercontent.com';
+  let deliveredExpenseChannel=null;
+  window.addEventListener('message',event=>{
+    const frame=document.getElementById('pm-frame'),message=event.data;
+    if(event.origin!==expenseOrigin||!event.source||message?.type!=='ty-expense-ready'||
+      !frame?.src||!frame.dataset.channel||message.channel!==frame.dataset.channel||
+      deliveredExpenseChannel===message.channel)return;
+    if(!sessionToken||Date.now()>=tokenExpires){
+      event.source.postMessage({type:'ty-expense-auth-error',channel:message.channel},event.origin);return;
+    }
+    deliveredExpenseChannel=message.channel;
+    // Deliver only to the verified child window and exact origin; never URL/localStorage.
+    event.source.postMessage({type:'ty-expense-google-auth',channel:message.channel,accessToken:sessionToken},event.origin);
+  });
   const $=selector=>root.querySelector(selector);
   const fmt=n=>n===null?'待補':String(Math.round(n));
   const pct=n=>Number.isFinite(n)?(n*100).toFixed(1)+'%':'—';
@@ -23,6 +37,8 @@
   function signOut(message='已登出儀表板。') {
     requestVersion++;
     sessionToken=null;tokenExpires=0;
+    deliveredExpenseChannel=null;
+    window.dispatchEvent(new CustomEvent('ty:expense-signout'));
     window.clearTimeout(expiryTimer);
     newRows=[];metaRows=[];budgetRows=[];consumptionRows=[];
     root.hidden=true;authWall.hidden=false;
@@ -113,7 +129,7 @@
       window.clearInterval(waitForGoogle);window.clearTimeout(loadTimeout);
       tokenClient=google.accounts.oauth2.initTokenClient({
         client_id:config.googleClientId,
-        scope:'https://www.googleapis.com/auth/spreadsheets.readonly',
+        scope:'https://www.googleapis.com/auth/spreadsheets.readonly openid https://www.googleapis.com/auth/userinfo.email',
         callback:response=>{
           if(response.error||!response.access_token){authButton.disabled=false;setAuthStatus('Google 授權未完成，請重新登入。',true);return;}
           sessionToken=response.access_token;
